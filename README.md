@@ -95,3 +95,8 @@ Once you run the Jenkins job (or push new code to trigger automatically), open a
 http://54.221.183.57/
 ```
 ## You should see your portfolio website live. 🎉
+![](./img/1.png)
+![](./img/2.png)
+![](./img/3.png)
+![](./img/4.png)
+![](./img/5.png)
