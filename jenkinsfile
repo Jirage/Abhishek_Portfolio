@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        SSH_CRED = 'Jenkins_Node_Server'
-        SERVER_IP = '54.221.183.57'
+        SSH_CRED = 'Jenkins_Node_Server'   // Jenkins credential ID
+        SERVER_IP = '54.221.183.57'        // Your Deploy EC2 IP
         REMOTE_USER = 'ubuntu'
         WEB_DIR = '/var/www/html'
     }
@@ -25,11 +25,25 @@ pipeline {
                         echo "Uploading new files to /tmp on server..."
                         scp -r index.html assets/css assets/js assets/images ${REMOTE_USER}@${SERVER_IP}:/tmp/
 
+                        echo "Verifying files in /tmp..."
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} "ls -l /tmp"
+
                         echo "Deploying files to Apache directory..."
-                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} "sudo cp -r /tmp/index.html /tmp/assets/css /tmp/assets/js /tmp/assets/images ${WEB_DIR}/"
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} "sudo cp -r /tmp/index.html /tmp/css /tmp/js /tmp/images ${WEB_DIR}/"
+
+                        echo "Deployment completed successfully!"
                     '''
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Deployment Successful!'
+        }
+        failure {
+            echo '❌ Deployment Failed. Check logs above.'
         }
     }
 }
