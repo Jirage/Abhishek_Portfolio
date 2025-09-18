@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        SSH_CRED = 'Jenkins_Node_Server'   // Jenkins credential ID
-        SERVER_IP = '54.221.183.57'        // Your Deploy EC2 IP
+        SSH_CRED = 'Jenkins_Node_Server'
+        SERVER_IP = '54.221.183.57'
         REMOTE_USER = 'ubuntu'
         WEB_DIR = '/var/www/html'
     }
@@ -22,28 +22,22 @@ pipeline {
                         echo "Cleaning old files on server..."
                         ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} "sudo rm -rf ${WEB_DIR}/*"
 
-                        echo "Uploading new files to /tmp on server..."
-                        scp -r index.html assets/css assets/js assets/images ${REMOTE_USER}@${SERVER_IP}:/tmp/
+                        echo "Uploading project files to /tmp..."
+                        scp -r index.html assets ${REMOTE_USER}@${SERVER_IP}:/tmp/
 
-                        echo "Verifying files in /tmp..."
+                        echo "Verifying /tmp content..."
                         ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} "ls -l /tmp"
 
-                        echo "Deploying files to Apache directory..."
-                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} "sudo cp -r /tmp/index.html /tmp/css /tmp/js /tmp/images ${WEB_DIR}/"
+                        echo "Deploying to Apache directory..."
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} "sudo cp -r /tmp/index.html /tmp/assets ${WEB_DIR}/"
 
-                        echo "Deployment completed successfully!"
+                        echo "Restarting Apache to clear cache..."
+                        ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${SERVER_IP} "sudo systemctl restart apache2"
+
+                        echo "✅ Deployment completed!"
                     '''
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ Deployment Successful!'
-        }
-        failure {
-            echo '❌ Deployment Failed. Check logs above.'
         }
     }
 }
