@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SSH_CRED = 'Jenkins_Node_Server'
-        SERVER_IP = '54.221.183.57'
+        SERVER_IP = '98.81.128.211'
         REMOTE_USER = 'ubuntu'
         WEB_DIR = '/var/www/html'
     }
